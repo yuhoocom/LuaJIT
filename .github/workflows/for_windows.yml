@@ -2,10 +2,11 @@ name: Build LuaJIT for Windows
 
 on:
   push:
-    branches: [ "v2.1" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "v2.1" ]
-  workflow_dispatch:
+    branches:
+      - main
 
 jobs:
   build:
@@ -13,38 +14,28 @@ jobs:
 
     strategy:
       matrix:
-        platform: [x86, x64] # 构建目标平台
+        arch: [x86, x64]
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v2
 
-    - name: Setup MSVC environment
-      run: |
-        if ('${{ matrix.platform }}' -eq 'x86') {
-          cmd /c ""C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat""
-        } else {
-          cmd /c ""C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat""
-        }
-
-    - name: Clone LuaJIT
-      run: |
-        git clone https://github.com/LuaJIT/LuaJIT.git
-        cd LuaJIT
-        git checkout v2.1 # 使用 LuaJIT 2.1 稳定版本
-
-    - name: Build LuaJIT for ${{ matrix.platform }}
-      run: |
-        cd LuaJIT/src
-        if ('${{ matrix.platform }}' -eq 'x86') {
-          nmake /f msvcbuild.mak
-        } else {
-          nmake /f msvcbuild.mak BUILDMODE=static
-        }
-
-    - name: Upload LuaJIT binaries
-      uses: actions/upload-artifact@v3
+    - name: Set up MSVC
+      uses: ilammy/msvc-dev-cmd@v1
       with:
-        name: luajit-${{ matrix.platform }}-binaries
-        path: |
-          LuaJIT/src/luajit.exe
+        arch: ${{ matrix.arch }}
+
+    - name: Build LuaJIT
+      run: |
+        cd src
+        if [ "${{ matrix.arch }}" == "x86" ]; then
+          nmake /f Makefile.msvc
+        else
+          nmake /f Makefile.msvc BUILDMODE=static
+        fi
+
+    - name: Archive build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: LuaJIT-${{ matrix.arch }}
+        path: src/luajit.exe
