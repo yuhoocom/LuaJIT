@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest # 使用 Windows 构建环境
+    runs-on: windows-latest
 
     strategy:
       matrix:
@@ -21,11 +21,11 @@ jobs:
 
     - name: Setup MSVC environment
       run: |
-        if [ "${{ matrix.platform }}" == "x86" ]; then
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
-        else
-          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-        fi
+        if (${{ matrix.platform }} -eq 'x86') {
+          & "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
+        } else {
+          & "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        }
 
     - name: Clone LuaJIT
       run: |
@@ -36,11 +36,11 @@ jobs:
     - name: Build LuaJIT for ${{ matrix.platform }}
       run: |
         cd LuaJIT/src
-        if [ "${{ matrix.platform }}" == "x86" ]; then
+        if (${{ matrix.platform }} -eq 'x86') {
           nmake /f msvcbuild.mak
-        else
+        } else {
           nmake /f msvcbuild.mak BUILDMODE=static
-        fi
+        }
 
     - name: Upload LuaJIT binaries
       uses: actions/upload-artifact@v3
