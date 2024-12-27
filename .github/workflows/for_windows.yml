@@ -24,10 +24,11 @@ jobs:
     - name: Setup MSVC environment
       run: |
         if ('${{ matrix.platform }}' -eq 'x86'){
-          cmd /c "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvars32.bat"
+          cmd /c "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvars32.bat\""
         } else{
-          cmd /c "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat"
+          cmd /c "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat\""
         }
+
 
 
     - name: Clone LuaJIT repository
