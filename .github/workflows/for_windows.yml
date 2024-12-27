@@ -21,7 +21,7 @@ jobs:
 
     - name: Setup MSVC environment
       run: |
-        if (${{ matrix.platform }} -eq 'x86') {
+        if ('${{ matrix.platform }}' -eq 'x86') {
           & "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
         } else {
           & "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
@@ -36,7 +36,7 @@ jobs:
     - name: Build LuaJIT for ${{ matrix.platform }}
       run: |
         cd LuaJIT/src
-        if (${{ matrix.platform }} -eq 'x86') {
+        if ('${{ matrix.platform }}' -eq 'x86') {
           nmake /f msvcbuild.mak
         } else {
           nmake /f msvcbuild.mak BUILDMODE=static
