@@ -1,0 +1,50 @@
+name: Build LuaJIT for Windows
+
+on:
+  push:
+    branches: [ "v2.1" ]
+  pull_request:
+    branches: [ "v2.1" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest # 使用 Windows 构建环境
+
+    strategy:
+      matrix:
+        platform: [x86, x64] # 构建目标平台
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup MSVC environment
+      run: |
+        if [ "${{ matrix.platform }}" == "x86" ]; then
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
+        else
+          call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        fi
+
+    - name: Clone LuaJIT
+      run: |
+        git clone https://github.com/LuaJIT/LuaJIT.git
+        cd LuaJIT
+        git checkout v2.1 # 使用 LuaJIT 2.1 稳定版本
+
+    - name: Build LuaJIT for ${{ matrix.platform }}
+      run: |
+        cd LuaJIT/src
+        if [ "${{ matrix.platform }}" == "x86" ]; then
+          nmake /f msvcbuild.mak
+        else
+          nmake /f msvcbuild.mak BUILDMODE=static
+        fi
+
+    - name: Upload LuaJIT binaries
+      uses: actions/upload-artifact@v3
+      with:
+        name: luajit-${{ matrix.platform }}-binaries
+        path: |
+          LuaJIT/src/luajit.exe
