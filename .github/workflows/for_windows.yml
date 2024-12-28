@@ -21,17 +21,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Setup MSVC environment
-      run: |
-        if ($env:matrix_platform -eq 'x86') {
-          $path = "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvars32.bat"
-          cmd /c "`"$path`""
-        } else {
-          $path = "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat"
-          cmd /c "`"$path`""
-        }
-
-
 
     - name: Clone LuaJIT repository
       run: |
